@@ -20,15 +20,39 @@ arpValues = arpValues.replace('-', ':')
 startString = 2
 endString = 10
 # Import the xml file that contains the list of known OUIs
-tree = xml.etree.ElementTree.parse('OUI.xml')
+tree = xml.etree.ElementTree.parse('OUI2.xml')
 root = tree.getroot()
 ouiList = []
-for record in root.findall('record'):
-    oui = record.find('oui').text
-    manufacturer = record.find('companyName').text
-    ouiList.append([oui, manufacturer])
 
-for i in range(count):
-    tempstr = arpValues[startString:endString]
-    startString = startString + 21
-    endString = endString + 21
+# Only needed to remove unnecessary elements in original xml file
+# for elem in root.iter():
+#     for child in list(elem):
+#         if child.tag == 'isPrivate':
+#             elem.remove(child)
+#         if child.tag == 'companyAddress':
+#             elem.remove(child)
+#         if child.tag == 'countryCode':
+#             elem.remove(child)
+#         if child.tag == 'assignmentBlockSize':
+#             elem.remove(child)
+#         if child.tag == 'dateCreated':
+#             elem.remove(child)
+#         if child.tag == 'dateUpdated':
+#             elem.remove(child)
+#
+# tree.write('OUI2.xml')
+
+# for record in root.findall('record'):
+#
+#     oui = record.find('oui').text
+#     manufacturer = record.find('companyName').text
+#     ouiList.append([oui, manufacturer])
+#
+# ouiList = str(ouiList)
+# for i in range(count):
+#     tempstr = arpValues[startString:endString]
+#     print(tempstr)
+#     match = re.findall(tempstr, ouiList)
+#     print(match)
+#     startString = startString + 21
+#     endString = endString + 21
