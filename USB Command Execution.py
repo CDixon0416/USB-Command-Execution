@@ -26,6 +26,7 @@ import xml.etree.ElementTree
 ipconfig = os.popen('ipconfig /all').read()
 arp = os.popen('arp -a').read()
 hostname = os.popen('hostname').read()
+hostname = hostname.rstrip() + '.txt'
 
 # Create the list of MAC addresses and gather the number of results for iterating through
 arpValues = re.findall("..-..-..-..-..-..", arp)
@@ -42,15 +43,47 @@ endString = 10
 # Import the xml file that contains the list of known OUIs
 tree = xml.etree.ElementTree.parse('OUI2.xml')
 root = tree.getroot()
+results = []
 
-for i in range(count):
+# Iterate over the list of arpValues
+for arpValuesEntry in range(count):
+    # Grab OUI portion of MAC address
     oui = arpValues[startString:endString]
     oui = oui.upper()
-    x = 0
+    xmlEntry = 0
+    # Iterate through the tree structure of xml document
     for record in root:
-        rootHolder = root[x].findtext("oui")
+        rootHolder = root[xmlEntry].findtext("oui")
         if rootHolder == oui:
-            print(root[x].findtext("oui"), root[x].findtext("companyName"))
-        x = x + 1
+            # Create results list
+            results.append([root[xmlEntry].findtext("oui"), root[xmlEntry].findtext("companyName")])
+        # Increment entry in xml document
+        xmlEntry = xmlEntry + 1
+    # Increment entry in list of arpValues
     startString = startString + 21
     endString = endString + 21
+
+# Save document to text file
+file = open(hostname, 'w+')
+ipResult = re.findall('IPv4 Address.*', str(ipconfig))
+ipResult = str(ipResult)
+ipResult = ipResult.replace(". ", "")
+ipResult = ipResult.replace("[", "")
+ipResult = ipResult.replace("]", "")
+ipResult = ipResult.replace(" '", "'")
+ipResult = ipResult.replace(",", "\n")
+ipResult = ipResult.replace("'", "")
+results = str(results)
+results = results.replace("],", "\n")
+results = results.replace("[[", "")
+results = results.replace("[", "")
+results = results.replace("]", "")
+results = results.replace(" '", "'")
+results = results.replace(",'", "-->")
+results = results.replace("'", "")
+file.write("List of known IP addresses\n")
+file.write(ipResult)
+file.write("\n\n")
+file.write("List of known network adapters from arp table\n")
+file.write(results)
+file.close
